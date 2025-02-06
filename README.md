@@ -24,7 +24,7 @@ func main() {
 	client := deepseekapi.NewClient( /* apiKey */ )
 
 	// chat
-	chatRequest := deepseekapi.NewChatRequest(deepseekapi.ModelTypeReasoner, deepseekapi.UserMessage("你好"))
+	chatRequest := deepseekapi.NewChatRequest(deepseekapi.ModelTypeReasoner, deepseekapi.UserMessage("Hi"))
 	chatReply, err := client.Chat(chatRequest)
 	if err != nil {
 		panic(err)
@@ -32,7 +32,7 @@ func main() {
 	fmt.Println(chatReply)
 
 	// stream-chat
-	streamChatRequest := deepseekapi.NewChatRequest(deepseekapi.ModelTypeReasoner, deepseekapi.UserMessage("你好"))
+	streamChatRequest := deepseekapi.NewChatRequest(deepseekapi.ModelTypeReasoner, deepseekapi.UserMessage("Hi"))
 	streamChatRequest.StreamOutput()
 
 	isThink := true
@@ -79,12 +79,12 @@ cd deepseek-api
 
 ### Stream Chat
 ```bash
-go run cmd/main.go -api-key /-- you deepseek API key --/ stream-chat "你好"
+go run cmd/main.go -api-key /-- you deepseek API key --/ stream-chat "Hi"
 ```
 
 ### Chat
 ```bash
-go run cmd/main.go -api-key /-- you deepseek API key --/ chat "你好"
+go run cmd/main.go -api-key /-- you deepseek API key --/ chat "Hi"
 ```
 
 ### User Balance
