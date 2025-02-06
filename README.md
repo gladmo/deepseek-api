@@ -6,6 +6,9 @@
 go get github.com/edznux/deepseek-api
 ```
 
+## Document
+[DeepSeek API Docs](https://api-docs.deepseek.com/api/deepseek-api)
+
 ## Usage
 
 ```bash
