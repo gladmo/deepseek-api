@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-go get github.com/edznux/deepseek-api
+go get github.com/gladmo/deepseek-api
 ```
 
 ## Document
@@ -80,19 +80,32 @@ cd deepseek-api
 ### Stream Chat
 ```bash
 go run cmd/main.go -api-key /-- you deepseek API key --/ stream-chat "Hi"
+
+<Think>
+Okay, the user just said "Hi". I should respond in a friendly and welcoming manner. Let me make sure to keep the tone positive and open. Maybe start with a greeting and offer assistance. Something like, "Hello! How can I assist you today?" That should work.
+<Think>
+
+Hello! How can I assist you today?
 ```
 
 ### Chat
 ```bash
 go run cmd/main.go -api-key /-- you deepseek API key --/ chat "Hi"
+
+{"messages":[{"content":"Hi","role":"user"}],"model":"deepseek-reasoner","response_format":{"type":"text"},"stop":null,"stream":false,"stream_options":null,"tools":null,"logprobs":false}
+{"id":"a3d182fe-xxxx-xxxx-xxxx-6a8c85464d02","choices":[{"finish_reason":"stop","index":0,"delta":{"content":"","reasoning_content":"","tool_calls":null,"role":""},"message":{"content":"Hello! How can I assist you today?","reasoning_content":"Okay, the user just said \"Hi\". I should respond in a friendly and welcoming manner. Let me make sure to keep it natural and open-ended so they feel comfortable asking anything. Maybe start with a greeting and offer help. Something like, \"Hello! How can I assist you today?\" That should work.","tool_calls":null,"role":"assistant"},"logprobs":{"content":null}}],"created":1739117803,"model":"deepseek-reasoner","system_fingerprint":"fp_7e73fd9a08","object":"chat.completion","usage":{"completion_tokens":74,"prompt_tokens":6,"prompt_cache_hit_tokens":0,"prompt_cache_miss_tokens":6,"total_tokens":80,"completion_tokens_details":{"reasoning_tokens":63}}}
 ```
 
 ### User Balance
 ```bash
 go run cmd/main.go -api-key /-- you deepseek API key --/ balance
+
+{"is_available":true,"balance_infos":[{"currency":"CNY","total_balance":"291.86","granted_balance":"291.86","topped_up_balance":"0.00"}]}
 ```
 
 ### List Models
 ```bash
 go run cmd/main.go -api-key /-- you deepseek API key --/ list-models
+
+{"object":"list","data":[{"id":"deepseek-chat","object":"model","owned_by":"deepseek"},{"id":"deepseek-reasoner","object":"model","owned_by":"deepseek"}]}
 ```
