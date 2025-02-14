@@ -35,6 +35,8 @@ func main() {
 		err = testChat(client, flag.Arg(1))
 	case "stream-chat":
 		err = streamChat(client, flag.Arg(1))
+	case "function-call":
+		err = functionCall(client, flag.Arg(1))
 	default:
 		flag.PrintDefaults()
 		return
@@ -122,5 +124,106 @@ func balance(client *deepseekapi.Client) (err error) {
 	}
 
 	fmt.Println(string(b))
+	return
+}
+
+var getWeatherFunc = []deepseekapi.Tool{
+	{
+		Type: "function",
+		Function: deepseekapi.ToolFunction{
+			Description: "Get weather of an location, the user shoud supply a location first",
+			Name:        "get_weather",
+			Parameters: deepseekapi.ToolFunctionParameters{
+				Type: "object",
+				Properties: map[string]any{
+					"location": map[string]any{
+						"type":        "string",
+						"description": "The city and state, e.g. San Francisco, CA",
+					},
+				},
+				Required: []string{"location"},
+			},
+		},
+	},
+}
+
+func functionCall(client *deepseekapi.Client, message string) (err error) {
+	messages := deepseekapi.Messages{deepseekapi.UserMessage(message)}
+	chatRequest := deepseekapi.NewChatRequest(deepseekapi.ModelTypeChat, messages...)
+	chatRequest.Tools = getWeatherFunc
+
+	b, err := json.Marshal(chatRequest)
+	if err != nil {
+		return err
+	}
+	fmt.Println("req1", string(b))
+	// return
+
+	chat, err := client.Chat(chatRequest)
+	if err != nil {
+		return err
+	}
+
+	b, err = json.Marshal(chat)
+	if err != nil {
+		return err
+	}
+	fmt.Println("stage1", string(b))
+
+	// call function
+	replyMessage := chat.Choices[0].Message
+	tool := replyMessage.ToolCalls[0]
+	messages.AddMessage(deepseekapi.Message{
+		Content:   replyMessage.Content,
+		Role:      replyMessage.Role,
+		ToolCalls: replyMessage.ToolCalls,
+	})
+
+	toolMsg, err := testFunctionCallFn(tool.Function)
+	if err != nil {
+		return
+	}
+	messages.AddMessage(deepseekapi.ToolMessage(string(toolMsg), tool.Id))
+
+	chatRequest = deepseekapi.NewChatRequest(deepseekapi.ModelTypeChat, messages...)
+	b, err = json.Marshal(chatRequest)
+	if err != nil {
+		return err
+	}
+	fmt.Println("req2", string(b))
+
+	chat, err = client.Chat(chatRequest)
+	if err != nil {
+		return err
+	}
+
+	b, err = json.Marshal(chat)
+	if err != nil {
+		return err
+	}
+	fmt.Println("stage2", string(b))
+
+	return
+}
+
+type GetWeatherCallReply struct {
+	Location    string `json:"location"`
+	Temperature int32  `json:"temperature"`
+	Unit        string `json:"unit"`
+}
+
+func testFunctionCallFn(params deepseekapi.ReplyFunction) (reply []byte, err error) {
+	switch params.Name {
+	case "get_weather":
+		var r GetWeatherCallReply
+		err = json.Unmarshal([]byte(params.Arguments), &r)
+		if err != nil {
+			return
+		}
+		r.Temperature = 110
+		r.Unit = "Celsius"
+		return json.Marshal(r)
+	}
+
 	return
 }

@@ -194,14 +194,20 @@ type ChatCompletionNamedToolChoice struct {
 }
 
 type Tool struct {
-	Type     string `json:"type"`
-	Function struct {
-		Description string `json:"description"`
-		Name        string `json:"name"`
-		parameters  struct {
-			Property string `json:"property"`
-		}
-	}
+	Type     string       `json:"type"`
+	Function ToolFunction `json:"function"`
+}
+
+type ToolFunction struct {
+	Description string                 `json:"description"`
+	Name        string                 `json:"name"`
+	Parameters  ToolFunctionParameters `json:"parameters"`
+}
+
+type ToolFunctionParameters struct {
+	Type       string         `json:"type"`
+	Properties map[string]any `json:"properties"`
+	Required   []string       `json:"required"`
 }
 
 type StreamOptions struct {
@@ -221,6 +227,8 @@ type Message struct {
 	Prefix           bool   `json:"prefix,omitempty"`            // (Beta) 设置此参数为 true，来强制模型在其回答中以此 assistant 消息中提供的前缀内容开始。
 	ReasoningContent string `json:"reasoning_content,omitempty"` // (Beta) 用于 deepseek-reasoner 模型在对话前缀续写功能下，作为最后一条 assistant 思维链内容的输入。使用此功能时，prefix 参数必须设置为 true。
 	ToolCallId       string `json:"tool_call_id,omitempty"`      // 此消息所响应的 tool call 的 ID。
+
+	ToolCalls []ReplyToolCalls `json:"tool_calls,omitempty"`
 }
 
 func SystemMessage(content string, name ...string) Message {
